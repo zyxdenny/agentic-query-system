@@ -1,7 +1,7 @@
 # Agent Query System
 
 ## About
-This is an AI query agent for camera feeds, encoder and decoder. Raw data files are in [./camera-raw-data][./camera-raw-data].
+This is an AI query agent for camera feeds, encoder and decoder. Raw data files are in [./camera-raw-data](./camera-raw-data).
 
 ## Usage
 You need to have an [Anthropic API key](https://docs.anthropic.com/en/docs/get-started) and set it as an environment variable.
