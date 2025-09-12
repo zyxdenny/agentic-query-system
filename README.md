@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 Run the agent with
 ```bash
-python3 main.py
+./start_agent
 ```
 
 To exit the program, use either `Ctrl+d` or enter a prompt to ask for exit.
