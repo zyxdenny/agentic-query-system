@@ -1,3 +1,5 @@
 anthropic
 langgraph
 langchain[anthropic]
+langchain-mcp-adapters
+mcp
