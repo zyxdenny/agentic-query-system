@@ -18,3 +18,11 @@ Run the agent with
 ```
 
 To exit the program, use either `Ctrl+d` or enter a prompt to ask for exit.
+
+# Queries
+The agent will translate human language to SQL queries, and use MCP to query the database. 
+Some examples are in [./test_questions.txt](./test_questions.txt).
+
+# Demo
+Please watch the demo.
+[Demo](https://youtu.be/gtsSLyOyyvY)
