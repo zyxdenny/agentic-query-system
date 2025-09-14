@@ -9,6 +9,7 @@ You need to have an [Anthropic API key](https://docs.anthropic.com/en/docs/get-s
 Set up a virtual enviroment and install required packages.
 ```bash
 python3 -m venv .env
+source .env/bin/activate
 pip install -r requirements.txt
 ```
 
