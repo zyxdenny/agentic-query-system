@@ -18,7 +18,7 @@ class State(TypedDict):
     messages: Annotated[list, add_messages]
 
 class Agent:
-    def __init__(self, model_name="anthropic:claude-3-7-sonnet-latest"):
+    def __init__(self, model_name="anthropic:claude-sonnet-4-0"):
         self.llm = init_chat_model(model_name)
         self.mcp_client = None
         self.tools = []
@@ -96,45 +96,59 @@ class Agent:
         """Handle a conversation turn, including tool calls."""
         config = {"configurable": {"thread_id": thread_id}}
         
-        events = self.graph.astream(
-            {"messages": [{"role": "user", "content": user_input}]},
-            config,
-            stream_mode="values",
-        )
-        
-        last_message_count = 0
-        async for state in events:
-            messages = state.get("messages", [])
+        try:
+            events = self.graph.astream(
+                {"messages": [{"role": "user", "content": user_input}]},
+                config,
+                stream_mode="messages",
+            )
             
-            # Process new messages since last iteration
-            new_messages = messages[last_message_count:]
-            last_message_count = len(messages)
-            
-            for message in new_messages:
-                if hasattr(message, 'tool_calls') and message.tool_calls:
-                    # AI is making tool calls
-                    print("\n🤖 Executing tools...")
-                    for tool_call in message.tool_calls:
-                        print(f"   📋 {tool_call['name']} - {tool_call.get('args', {})}")
+            async for chunk, metadata in events:
+               if hasattr(chunk, 'tool_calls') and chunk.tool_calls:
+                   for tool_call in chunk.tool_calls:
+                       if tool_call['name']:
+                           print(f"\n🤖 Executing tool {tool_call['name']}...")
+
+               elif hasattr(chunk, 'content') and chunk.content:
+                   content = chunk.content
+                   if hasattr(chunk, 'tool_call_id'):
+                       # This is tool output
+                       print("\n📤 Tool Results:")
+                       if isinstance(content, str):
+                           # Format tabular data nicely
+                           lines = content.strip().split('\n')
+                           for line in lines:
+                               print(f"   {line}")
+                       print("─" * 50)
+
+                   else:
+                       if isinstance(content, list):
+                           for block in content:
+                               if "text" in block:
+                                   print(block["text"], end="", flush=True)
+
+                               elif "type" in block and block["type"] == 'text':
+                                   text = getattr(block, 'text', str(block))
+                                   print(text, end="", flush=True)
+
+                       elif isinstance(content, str) and content:
+                           print(content, end="", flush=True)
+
+        except Exception as e:
+            try:
+                final_state = await self.graph.ainvoke(
+                    {"messages": [{"role": "user", "content": user_input}]},
+                    config
+                )
                 
-                elif hasattr(message, 'content') and message.content:
-                    # Check if this is a tool response
-                    if hasattr(message, 'tool_call_id'):
-                        # This is tool output
-                        print("\n📤 Tool Results:")
-                        content = message.content
-                        if isinstance(content, str):
-                            # Format tabular data nicely
-                            lines = content.strip().split('\n')
-                            for line in lines:
-                                print(f"   {line}")
-                        print("─" * 50)
-                    
-                    elif hasattr(message, 'type') and message.type == 'ai':
-                        # This is AI response - stream it character by character
-                        content = message.content
-                        if isinstance(content, str):
-                            print(content, end="", flush=True)
+                messages = final_state.get("messages", [])
+                if messages:
+                    last_message = messages[-1]
+                    if hasattr(last_message, 'content') and last_message.content:
+                        print(last_message.content)
+            
+            except Exception as fallback_error:
+                print(f"Error: {fallback_error}")
 
         print()
 

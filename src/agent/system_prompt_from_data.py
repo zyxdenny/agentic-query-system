@@ -25,19 +25,19 @@ Here is the data:
 
 Camera Feeds Table, stored in SQLite as `Table_feeds_v2` table. For queries about feed_table, you have to generate a SQL query and use the `sql_query` MCP tool.
 
-The definition of columns in `feed_table`, in CSV format:
+The definition of columns in `Table_feeds_v2`, in CSV format:
 {def_table}
 
-Encoder Parameters, in JSON:
+Encoder Parameters, in JSON. Use `get_field_encoder_param` MCP tool to get a field when necessary:
 {encoder_params}
 
-Encoder Schema, in JSON:
+Encoder Schema, in JSON. Use `get_field_encoder_schema` MCP tool to get a field of when necessary:
 {encoder_schema}
 
-Decoder Parameters, in JSON:
+Decoder Parameters, in JSON. Use `get_field_decoder_param` MCP tool to get a field when necessary:
 {decoder_params}
 
-Decoder Schema, in JSON:
+Decoder Schema, in JSON. Use `get_field_decoder_schema` MCP tool to get a field when necessary:
 {decoder_schema}
 
 Answer questions about camera feeds, encoding, and decoding.
